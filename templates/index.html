@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>🏏 IPL Data Analysis & Visualization Dashboard (2008–2026)</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='_css/style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="logo">🏏 IPL Analytics</div>
+
+<ul>
+    <li><a href="#home">Home</a></li>
+    <li><a href="#teams">Teams</a></li>
+    <li><a href="#players">Players</a></li>
+    <li><a href="#venues">Venues</a></li>
+    <li><a href="#about">About</a></li>
+</ul>
+</nav>
+
+<section id="home" class="hero">
+    <img src="{{ url_for('static', filename='_images/banner.jpg') }}" alt="IPL Banner">
+
+    <div class="hero-content">
+    <h1>🏏 IPL Data Analysis Dashboard</h1>
+
+    <p>
+        Explore IPL statistics, team performance, player records,
+        and season-wise insights using interactive visualizations.
+    </p>
+
+    <a href="#dashboard" class="hero-btn">
+        Explore Dashboard
+    </a>
+</div>
+</section>
+<section class="dashboard-info">
+
+    <h2>📊 Welcome to IPL Analytics Dashboard</h2>
+
+    <p>
+        This dashboard provides comprehensive analysis of the Indian Premier League
+        from 2008–2026 using Python, Flask, Pandas and Chart.js.
+    </p>
+
+    <div class="features">
+
+        <div class="feature-box">
+            🏏
+            <h3>Match Analysis</h3>
+            <p>Analyze every IPL season with interactive charts.</p>
+        </div>
+
+        <div class="feature-box">
+            🏆
+            <h3>Team Performance</h3>
+            <p>Compare winning teams and tournament trends.</p>
+        </div>
+
+        <div class="feature-box">
+            👤
+            <h3>Player Statistics</h3>
+            <p>View Player of the Match awards and player records.</p>
+        </div>
+
+        <div class="feature-box">
+            🏟️
+            <h3>Venue Insights</h3>
+            <p>Explore the most popular IPL stadiums.</p>
+        </div>
+
+    </div>
+
+</section>
+<section class="stats-title">
+    <h2>📈 IPL Tournament Overview</h2>
+    <p>Quick statistics from IPL Seasons (2008–2026)</p>
+</section>
+<div class="cards" id="dashboard">
+    <div class="card">
+        <h2>🏏 Total Matches</h2>
+        <h1>{{ total_matches }}</h1>
+    </div>
+
+    <div class="card">
+        <h2>👥 Total Teams</h2>
+        <h1>{{ total_teams }}</h1>
+    </div>
+
+    <div class="card">
+        <h2>📅 Total Seasons</h2>
+        <h1>{{ total_seasons }}</h1>
+    </div>
+
+    <div class="card">
+        <h2>🏟️ Total Venues</h2>
+        <h1>{{ total_venues }}</h1>
+    </div>
+</div>
+
+<form method="GET" class="filter-section">
+
+    <input
+    type="text"
+    name="search"
+    placeholder="Search Player or Team"
+    value="{{ request.args.get('search', '') }}">
+
+    <select name="season">
+    <option value="">All Seasons</option>
+    {% for season in seasons %}
+        <option value="{{ season }}"
+            {% if request.args.get('season') == season %}selected{% endif %}>
+            {{ season }}
+        </option>
+    {% endfor %}
+    </select>
+
+    <select name="team">
+    <option value="">All Teams</option>
+    {% for team in all_teams %}
+    <option value="{{ team }}"
+        {% if request.args.get('team') == team %}selected{% endif %}>
+        {{ team }}
+    </option>
+    {% endfor %}
+    </select>
+
+    <button type="submit">Apply Filter</button>
+
+    <a href="/" class="reset-btn">Reset</a>
+
+    <a href="/download?team={{ request.args.get('team','') }}&season={{ request.args.get('season','') }}"
+   class="download-btn">
+   Download CSV
+</a>
+
+</form>
+
+<div class="chart-container">
+    <canvas id="seasonChart"></canvas>
+</div>
+
+<div id="teams" class="chart-container">
+    <h2>🏆 Top Winning Teams</h2>
+    <canvas id="winnerChart"></canvas>
+</div> 
+
+<div class="chart-grid">
+<div class="chart-container">
+    <h2>🥇 Winning Teams (Doughnut Chart)</h2>
+    <canvas id="topWinningChart"></canvas>
+</div>
+
+<div id="players" class="chart-container">
+    <h2>🏅 Top 10 Player of the Match Winners</h2>
+    <canvas id="playerChart"></canvas>
+</div>
+<div id="venues" class="chart-container">
+    <h2>🏟️ Top 10 IPL Venues</h2>
+    <canvas id="venueChart"></canvas>
+</div>
+</div>
+<div class="chart-container">
+    <h2>🏏 Top 10 Run Scorers (Orange Cap)</h2>
+    <canvas id="batsmanChart"></canvas>
+</div>
+<script>
+const seasons = {{ seasons | tojson }};
+const season_matches = {{ season_matches | tojson }};
+
+const winning_teams = {{ winning_teams | tojson }};
+const winning_counts = {{ winning_counts | tojson }};
+
+const top_players = {{ top_players | tojson }};
+const top_awards = {{ top_awards | tojson }};
+
+const top_venues = {{ top_venues | tojson }};
+const venue_matches = {{ venue_matches | tojson }};
+
+const batsman_names = {{ batsman_names | tojson }};
+const batsman_runs = {{ batsman_runs | tojson }};
+</script>
+
+<script src="{{ url_for('static', filename='_js/script.js') }}"></script>
+
+<footer class="footer" id="about">
+
+    <h2>🏏 IPL Data Analysis & Visualization</h2>
+
+    <p>
+        An interactive dashboard for analyzing Indian Premier League (IPL) data
+        from 2008–2026 using Python, Flask, Pandas and Chart.js.
+    </p>
+
+    <hr>
+
+    <p><strong>Developed By:</strong>Sanjira Khatun </p>
+    <p><strong>Course:</strong> B.Tech  (AIDS)</p>
+    <p><strong>Technologies:</strong> Python | Flask | Pandas | HTML | CSS | JavaScript | Chart.js</p>
+
+    <p style="margin-top:20px;">
+        © 2026 IPL Data Analysis Dashboard. All Rights Reserved.
+    </p>
+
+</footer>
+
+</body>
+</html>
